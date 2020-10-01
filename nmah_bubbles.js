@@ -1,15 +1,38 @@
 (function() {
 	var width = 1200,
-	height = 900;
+	height = 700;
+
+	// 5 add div (also in css)
+	var div = d3.select("#tooltipspot").append("div")	
+    .attr("class", "tooltipspot")				
+    .style("opacity", 0);
 
 
-	// creates svg object in html
-	var svg = d3.select("#chart")
+	// RESPONSIVE: creates svg object in html
+	// https://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js
+	var svg = d3.select("div#chart")
+	.append("div")
+	//container class to make it responsive
+	.classed("svg-container", true)
 	.append("svg")
+	// Responsive SVG needs these 2 attributes and no width and height attr.
+	.attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox","0 0 " + width + " " + height)
+    // Class to make it responsive.
+    .classed("svg-content-responsive", true)
 	.attr("height", height)
 	.attr("width", width)
 	.append("g")
 	.attr("transform", "translate(0,0)")
+	.attr("class", "legendOrdinal")
+
+	// // ORIG: creates svg object in html
+	// var svg = d3.select("#chart")
+	// .append("svg")
+	// .attr("height", height)
+	// .attr("width", width)
+	// .append("g")
+	// .attr("transform", "translate(0,0)")
 
 	// create svg defs (video 3, using imgs in d3 bubble charts)
 	var defs = svg.append("svg:defs")
@@ -32,8 +55,8 @@
 	// 3.1 createing forceX variable
 	var forceXSeparate = d3.forceX(function(d) {
 			if (d.border_check === 'ms') return '120'
-			if (d.border_check === 'pmh') return '300'
-			if (d.border_check === 'ccl') return '600'
+			if (d.border_check === 'ccl') return '350'
+			if (d.border_check === 'pmh') return '650'
 			if (d.border_check === 'wi') return '950'
 	}).strength(0.1)
 
@@ -55,14 +78,7 @@
 	.defer(d3.csv, "nmah_names_d3.csv")
 	.await(ready)
 
-	// 5 add div (also in css)
-	var div = d3.select("body").append("div")	
-    .attr("class", "tooltip")				
-    .style("opacity", 0);
 
-    // 6 add knowledge graph search variable
-    var kginput = d3.select("#myInput")
-    // .attr("id", "#myInput")
 
 	function ready (error, datapoints) {
 		
@@ -114,20 +130,27 @@
 				if (d.border_check === 'wi') return 'stroke: purple;'
 			})
 			.on("mouseover", function(d) {		
-            div.transition()				
-                .style("opacity", .9);		
-            div	.html(d.Name)	
-                .style("left", (d3.event.pageX) + "px")		
-                .style("top", (d3.event.pageY - 28) + "px");	
+            div.transition()
+	            .duration(200)					
+                .style("opacity", .9);
+    //         div.transition()
+				// .duration(200)	
+				// .style("opacity", .9);
+            div	.html(d.Name_Display + 
+                "<br />" + d.Items + " Items" + 
+                "<br />" + d.Sub_Category +
+                "<br /><a href='" + d.smithsonian_URL + "'>Click to Search NMAH</a>" +
+                "<br /><a href='" + d.google_URL + "'>Click to Google</a>")
+            // div	.html(d.Name_Display <br /> "-" + d.Sub_Category)
+                // .style("left", (parseInt(d3.select(this).attr("cx")) + document.getElementById("body").offsetLeft) + "px")	
+                // .style("top", (parseInt(d3.select(this).attr("cy")) + document.getElementById("body").offsetTop) + "px");		
+                // .style("left", (d3.event.pageX) + "px")		
+                // .style("top", (d3.event.pageY - 28) + "px");	
             })					
-        	.on("mouseout", function(d) {		
-            div.transition()			
-                .style("opacity", 0);	
-        	})
-        	.on("click", function(d){
-        	kginput .property("value", d.Name)
-        	d3.mouse(this)
-        	});
+        	// .on("mouseout", function(d) {		
+         //    div.transition()			
+         //        .style("opacity", 0);	
+        	// })
 
 	// 3 creating buttons and event listeners
 	// 4.2 change from the video - to stop the constant position recalculation
