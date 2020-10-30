@@ -71,7 +71,7 @@
 		.force("y", d3.forceY(height / 2).strength(0.1))
 		.force("collide", forceCollide)
 		// added stop
-		// .stop();
+		.stop();
 
 	// read csv
 	d3.queue()
